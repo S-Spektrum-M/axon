@@ -1,0 +1,7 @@
+toolchain:
+  extends: base.yaml
+  compiler:
+    cxx:
+      flags_append: ['-O3', '-DNDEBUG', '-flto=full', '-fPIE', '-ffunction-sections', '-fdata-sections', '-fstack-protector-strong']
+  linker:
+    flags_append: ['-flto=full', '-pie', '-Wl,--gc-sections,-z,relro,-z,now,--no-undefined,--build-id=sha1']

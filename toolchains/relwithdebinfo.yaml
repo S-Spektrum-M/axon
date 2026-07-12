@@ -1,0 +1,7 @@
+toolchain:
+  extends: debug.yaml
+  compiler:
+    cxx:
+      flags_append: ['-O2', '-flto=thin']
+  linker:
+    flags_append: ['-flto=thin']

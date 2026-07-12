@@ -1,0 +1,11 @@
+toolchain:
+  name: axon-clang21-linux
+  compiler:
+    cxx:
+      executable: clang++-21
+      flags: '-std=c++23 -stdlib=libc++ -Wall -Wextra -Wpedantic -Wshadow -Werror -fvisibility=hidden -pthread'
+  linker:
+    executable: clang++-21
+    flags: '-stdlib=libc++ -fuse-ld=mold -pthread -lc++abi -Wl,-rpath,/usr/lib/llvm-21/lib'
+  archiver:
+    executable: llvm-ar-21

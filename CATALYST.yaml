@@ -1,0 +1,61 @@
+common:
+  meta:
+    min_ver: 2.1.0
+  manifest:
+    name: axon
+    type: BINARY
+    version: 0.1.0
+    description: Transactional source control in C++23
+    provides: axon
+    toolchain: toolchains/debug.yaml
+    tooling:
+      FMT: clang-format-22
+      LINTER: clang-tidy-22
+      CC_LAUNCHER: ccache
+      CXX_LAUNCHER: ccache
+    dirs:
+      source: [src]
+      include: [src]
+      build: build
+  dependencies:
+    - name: openssl
+      source: vcpkg
+      triplet: x64-linux
+      linkage: static
+    - name: curl
+      source: vcpkg
+      triplet: x64-linux
+      linkage: static
+    - name: nlohmann-json
+      source: vcpkg
+      triplet: x64-linux
+    - name: llvm-blake3
+      source: custom
+      script: scripts/find-llvm.sh
+  hooks:
+    pre-build:
+      - script: scripts/verify-toolchain.sh
+debug:
+  manifest:
+    toolchain: toolchains/debug.yaml
+release:
+  manifest:
+    toolchain: toolchains/release.yaml
+sanitized-debug:
+  manifest:
+    toolchain: toolchains/sanitized.yaml
+relwithdebinfo:
+  manifest:
+    toolchain: toolchains/relwithdebinfo.yaml
+test:
+  manifest:
+    name: axon_tests
+    provides: axon_tests
+    toolchain: toolchains/sanitized.yaml
+    dirs:
+      source: [test]
+  hooks:
+    pre-test:
+      - catalyst: build -p sanitized-debug
+    post-test:
+      - script: "python3 test/integration.py build/common-sanitized-debug/axon"

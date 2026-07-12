@@ -1,0 +1,21 @@
+lockfile_version: 1.1.0
+vcpkg:
+  builtin_baseline: 903956eff7cb94774a9e805ff573c000afc43e3e
+dependencies:
+  - name: llvm-blake3
+    source: custom
+  - name: curl
+    source: vcpkg
+    version: 8.15.0
+    triplet: x64-linux
+    port_version: 0
+  - name: nlohmann-json
+    source: vcpkg
+    version: 3.12.0
+    triplet: x64-linux
+    port_version: 0
+  - name: openssl
+    source: vcpkg
+    version: 3.5.1
+    triplet: x64-linux
+    port_version: 0

@@ -1,0 +1,7 @@
+toolchain:
+  extends: debug.yaml
+  compiler:
+    cxx:
+      flags_append: ['-O1', '-fsanitize=address,undefined', '-fno-optimize-sibling-calls']
+  linker:
+    flags_append: ['-fsanitize=address,undefined']

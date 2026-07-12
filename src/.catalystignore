@@ -1,0 +1,3 @@
+# The test profile links test/unit.cpp's main against the library sources.
+test:
+  - axon.cpp
