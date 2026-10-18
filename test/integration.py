@@ -14,6 +14,7 @@ import sys
 import tempfile
 import time
 import unittest
+import urllib.error
 import urllib.request
 
 BINARY = str(Path(sys.argv.pop(1) if len(sys.argv) > 1 else 'build/common-debug/axon').resolve())
@@ -630,6 +631,41 @@ class AxonTest(unittest.TestCase):
         self.call('events', 'line-trunk', '--group', 'g1', '--commit', '1')
         from_commit = self.call('events', 'line-trunk', '--group', 'g1')
         self.assertTrue(isinstance(from_commit, list))
+
+    def test_web_view_proxies_allowlisted_reads(self):
+        self.seed()
+        web = subprocess.Popen([BINARY, 'web', '--listen', '127.0.0.1:0'], env=self.env,
+                               stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        try:
+            url = web.stdout.readline().strip()
+            base, token = url.split('/#token=')
+
+            def api(body, token=token, host=None):
+                headers = {'Content-Type': 'application/json', 'X-Axon-Token': token}
+                if host:
+                    headers['Host'] = host
+                request = urllib.request.Request(base + '/api', json.dumps(body).encode(), headers)
+                try:
+                    with urllib.request.urlopen(request, timeout=5) as response:
+                        return response.status, json.loads(response.read())
+                except urllib.error.HTTPError as error:
+                    return error.code, json.loads(error.read())
+
+            self.assertIn(b'<title>Axon</title>', urllib.request.urlopen(base + '/', timeout=5).read())
+            status, file = api({'command': 'get', 'args': ['trunk', 'a/file.txt']})
+            self.assertEqual((status, file['kind'], file['text']), (200, 'file', 'one\ntwo\nthree\nfour\nfive\n'))
+            status, listing = api({'command': 'get', 'args': ['trunk', '']})
+            self.assertEqual(listing['kind'], 'dir')
+            self.assertIn('a', listing['entries'])
+            self.assertEqual(len(api({'command': 'log', 'options': {'limit': '1'}})[1]), 1)
+            self.assertEqual(api({'command': 'write', 'args': ['ws', 'x']})[0], 400)
+            self.assertEqual(api({'command': 'status', 'options': {'request': 'true'}})[0], 400)
+            self.assertEqual(api({'command': 'lines'}, token='0' * 32)[0], 403)
+            self.assertEqual(api({'command': 'lines'}, host='attacker.example')[0], 403)
+        finally:
+            web.terminate()
+            web.wait(timeout=10)
+        self.call('web', '--listen', '0.0.0.0:0', ok=False)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

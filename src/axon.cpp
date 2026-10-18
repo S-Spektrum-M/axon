@@ -6,6 +6,7 @@
 #include "repository.hpp"
 #include "spool.hpp"
 #include "transport.hpp"
+#include "web.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -75,6 +76,7 @@ Usage: axon COMMAND [ARGS] [OPTIONS]
   # write, rm and mv accept --offline; use replay to send queued edits
   replay
   mount WS MOUNTPOINT              # foreground Linux FUSE filesystem
+  web [--listen 127.0.0.1:7080]    # read-only browser view, signed as you
   get line@N PATH
   stack WS --title TITLE [--intent KIND] [--land] [--wait]
   status [STACK] [--all]           diff STACK
@@ -171,6 +173,7 @@ int main(int argc, char **argv) {
             {"whoami", axon::Json::array()},
             {"replay", axon::Json::array()},
             {"mount", axon::Json::array()},
+            {"web", {"listen"}},
             {"symbol", axon::Json::array()},
             {"fork", {"from", "ws", "session", "ttl", "q"}},
             {"ws", axon::Json::array()},
@@ -313,6 +316,10 @@ int main(int argc, char **argv) {
             if (args.size() != 2)
                 throw std::runtime_error("usage: axon mount WORKSPACE MOUNTPOINT");
             axon::mountWorkspace(args[0], args[1], config, seed);
+            return 0;
+        }
+        if (command == "web") {
+            axon::serveWeb(config, seed, options.value("listen", "127.0.0.1:7080"));
             return 0;
         }
         if (options.value("offline", "false") == "true") {

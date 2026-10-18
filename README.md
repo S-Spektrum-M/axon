@@ -52,6 +52,19 @@ Private Ed25519 seeds are hex-encoded files with mode 0600.
 Axon uses its own versioned storage and RPC format (`axon-1`). Git
 import/export is the interchange path with other systems.
 
+## Web view
+
+```sh
+"$AXON" web                      # prints http://127.0.0.1:7080/#token=...
+```
+
+`web` serves a read-only browser view of lines, file trees at any snapshot,
+history, stacks with their diffs and requirements, and the merge queue. It runs
+locally and signs allowlisted read requests with your configured identity, so it
+sees what `axon` sees. It listens only on loopback, checks the `Host` header, and
+requires the per-launch token in the printed URL. It never issues workspace reads,
+which would change read sets. `--listen 127.0.0.1:PORT` picks the port (`0` for any).
+
 ## Agents and review
 
 ```sh

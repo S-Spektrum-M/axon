@@ -20,6 +20,7 @@ implementation status, especially for FUSE and C++ symbols.
 | Lifecycle | Conservative mark/sweep with 24-hour grace; `admin prune` retains live bases and configurable recent history, with dry-run | Physical event/history slots retain small tombstones to preserve cursors and snapshot numbers |
 | Git | First-parent import, export, push, repeated-import detection, modes/symlinks/binary fidelity, incremental fast-import chaining, original author identity/timestamp/timezone retained on import/export | None |
 | Transport | Versioned HTTP JSON RPC, Concurrent `ThreadPool` HTTP workers, libcurl client, IPv4 listener, direct CAS `/cas/<hash>`, Prometheus `/metrics`, regional CAS `cache` proxy tier with verified misses, verified client blob disk cache, connection-establishment retries, native TLS | Durable `--offline` edit spool and `replay` with server-side operation IDs; automatic retries after ambiguous failures remain disabled |
+| Web view | `axon web`: local read-only browser UI for files at any snapshot, history, stacks/diffs and queue; proxies allowlisted reads signed with the CLI identity; loopback-only, Host check, per-launch token | No write actions (review/land/abandon); no live event updates; file views are truncated at 1 MiB |
 | Tooling | Catalyst debug/release/sanitized/relwithdebinfo/test profiles, C++ unit tests, CLI integration suite, in-process multi-agent `bench` load model | None |
 
 `Line` (`src/line.cpp`) is unused apart from `DomainLockManager`.
